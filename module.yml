@@ -1,0 +1,100 @@
+---
+# Copyright 2018 widdix GmbH
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'cfn-modules: AWS Lambda event source: webhook'
+# cfn-modules:implements()
+Parameters:
+  LambdaModule:
+    Description: 'Stack name of lambda-function module.'
+    Type: String
+  AlertingModule:
+    Description: 'Optional but recommended stack name of alerting module.'
+    Type: String
+    Default: ''
+  HttpMethod:
+    Description: 'The HTTP method that clients use to call this method.'
+    Type: String
+    Default: ANY
+    AllowedValues: [ANY, GET, HEAD, POST, PUT, DELETE, OPTIONS]
+Conditions:
+  HasAlertingModule: !Not [!Equals [!Ref AlertingModule, '']]
+Resources:
+  Permission:
+    Type: 'AWS::Lambda::Permission'
+    Properties:
+      Action: 'lambda:InvokeFunction'
+      FunctionName: {'Fn::ImportValue': !Sub '${LambdaModule}-Name'}
+      Principal: 'apigateway.amazonaws.com'
+      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${RestApi}/*/${HttpMethod}/'
+  RestApi:
+    Type: 'AWS::ApiGateway::RestApi'
+    Properties:
+      Name: !Ref 'AWS::StackName'
+  Stage:
+    Type: 'AWS::ApiGateway::Stage'
+    Properties:
+      DeploymentId: !Ref Deployment
+      RestApiId: !Ref RestApi
+      StageName: webhook
+  Deployment:
+    DependsOn: Method
+    Type: 'AWS::ApiGateway::Deployment'
+    Properties:
+      RestApiId: !Ref RestApi
+  Method:
+    Type: 'AWS::ApiGateway::Method'
+    Properties:
+      AuthorizationType: NONE
+      HttpMethod: !Ref HttpMethod
+      Integration:
+        IntegrationHttpMethod: 'POST'
+        PassthroughBehavior: 'WHEN_NO_MATCH'
+        Type: 'AWS_PROXY'
+        Uri: !Sub
+        - 'arn:aws:apigateway:${Region}:lambda:path/2015-03-31/functions/${LambdaFunctionArn}/invocations'
+        - Region: !Ref 'AWS::Region'
+          LambdaFunctionArn: {'Fn::ImportValue': !Sub '${LambdaModule}-Arn'}
+      ResourceId: !GetAtt 'RestApi.RootResourceId'
+      RestApiId: !Ref RestApi
+  Alarm5XXErrorTooHigh:
+    Condition: HasAlertingModule
+    Type: 'AWS::CloudWatch::Alarm'
+    Properties:
+      AlarmDescription: 'Api Gateway server-side errors captured'
+      Namespace: 'AWS/ApiGateway'
+      MetricName: 5XXError
+      Statistic: Sum
+      Period: 60
+      EvaluationPeriods: 1
+      ComparisonOperator: GreaterThanThreshold
+      Threshold: 0
+      AlarmActions:
+      - 'Fn::ImportValue': !Sub '${AlertingModule}-Arn'
+      Dimensions:
+      - Name: ApiName
+        Value: !Ref 'AWS::StackName'
+      - Name: Stage
+        Value: !Ref Stage
+Outputs:
+  ModuleId:
+    Value: 'lambda-event-source-webhook'
+  ModuleVersion:
+    Value: '0.0.1'
+  StackName:
+    Value: !Ref 'AWS::StackName'
+  Url:
+    Value: !Sub 'https://${RestApi}.execute-api.${AWS::Region}.amazonaws.com/${Stage}'
+    Export:
+      Name: !Sub '${AWS::StackName}-Url'

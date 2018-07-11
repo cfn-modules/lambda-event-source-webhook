@@ -1,0 +1,30 @@
+{
+  "name": "@cfn-modules/lambda-event-source-webhook",
+  "version": "0.0.1",
+  "description": "Webhook event source for AWS Lambda function",
+  "author": "Michael Wittig <michael@widdix.de>",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "eslint": "5.1.0",
+    "ava": "0.25.0",
+    "axios": "0.18.0",
+    "@cfn-modules/test": "^0.0.7",
+    "@cfn-modules/lambda-function": "^0.0.18"
+  },
+  "scripts": {
+    "eslint": "eslint test",
+    "ava": "ava -c 4 test/*.js",
+    "test": "eslint test && ava -c 4 test/*.js"
+  },
+  "keywords": [
+    "cfn-modules"
+  ],
+  "homepage": "https://github.com/cfn-modules",
+  "bugs": {
+    "url": "https://github.com/cfn-modules/lambda-event-source-webhook/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cfn-modules/lambda-event-source-webhook.git"
+  }
+}

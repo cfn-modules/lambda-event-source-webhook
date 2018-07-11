@@ -1,0 +1,20 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'cfn-modules test'
+Resources:
+  Webhook:
+    Type: 'AWS::CloudFormation::Stack'
+    Properties:
+      Parameters:
+        LambdaModule: !GetAtt 'Function.Outputs.StackName'
+      TemplateURL: '../module.yml'
+  Function:
+    Type: 'AWS::CloudFormation::Stack'
+    Properties:
+      Parameters:
+        Handler: 'test.handler'
+        Runtime: 'nodejs8.10'
+      TemplateURL: '../node_modules/@cfn-modules/lambda-function/module.yml'
+Outputs:
+  Url:
+    Value: !GetAtt 'Webhook.Outputs.Url'
