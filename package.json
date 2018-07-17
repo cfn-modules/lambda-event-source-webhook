@@ -9,7 +9,7 @@
     "ava": "0.25.0",
     "axios": "0.18.0",
     "@cfn-modules/test": "^0.0.7",
-    "@cfn-modules/lambda-function": "^0.0.18"
+    "@cfn-modules/lambda-function": "^0.0.19"
   },
   "scripts": {
     "eslint": "eslint test",
