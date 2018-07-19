@@ -7,14 +7,14 @@ Resources:
     Properties:
       Parameters:
         LambdaModule: !GetAtt 'Function.Outputs.StackName'
-      TemplateURL: '../module.yml'
+      TemplateURL: './node_modules/@cfn-modules/lambda-event-source-webhook/module.yml'
   Function:
     Type: 'AWS::CloudFormation::Stack'
     Properties:
       Parameters:
         Handler: 'test.handler'
         Runtime: 'nodejs8.10'
-      TemplateURL: '../node_modules/@cfn-modules/lambda-function/module.yml'
+      TemplateURL: './node_modules/@cfn-modules/lambda-function/module.yml'
 Outputs:
   Url:
     Value: !GetAtt 'Webhook.Outputs.Url'

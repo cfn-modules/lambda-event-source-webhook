@@ -1,4 +1,4 @@
-exports.handler = async function(event, context) {
+exports.handler = async function(event) {
   console.log(JSON.stringify(event));
   return {statusCode: 204};
 };
