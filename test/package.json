@@ -9,6 +9,6 @@
     "@cfn-modules/lambda-function": "^0.0.19"
   },
   "scripts": {
-    "test": "eslint . && ava -c 4 ."
+    "test": "eslint . && ava -c 4 *.js"
   }
 }
