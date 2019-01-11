@@ -6,7 +6,7 @@
     "axios": "0.18.0",
     "@cfn-modules/test": "0.3.0",
     "@cfn-modules/lambda-event-source-webhook": "file:../",
-    "@cfn-modules/lambda-function": "1.1.0"
+    "@cfn-modules/lambda-function": "1.2.0"
   },
   "scripts": {
     "test": "eslint . && ava -c 4 *.js"
