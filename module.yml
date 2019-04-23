@@ -37,7 +37,7 @@ Resources:
       Action: 'lambda:InvokeFunction'
       FunctionName: {'Fn::ImportValue': !Sub '${LambdaModule}-Name'}
       Principal: 'apigateway.amazonaws.com'
-      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${RestApi}/*/${HttpMethod}/'
+      SourceArn: !Sub 'arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${RestApi}/*/${HttpMethod}/'
   RestApi:
     Type: 'AWS::ApiGateway::RestApi'
     Properties:
@@ -63,8 +63,9 @@ Resources:
         PassthroughBehavior: 'WHEN_NO_MATCH'
         Type: 'AWS_PROXY'
         Uri: !Sub
-        - 'arn:aws:apigateway:${Region}:lambda:path/2015-03-31/functions/${LambdaFunctionArn}/invocations'
-        - Region: !Ref 'AWS::Region'
+        - 'arn:${Partition}:apigateway:${Region}:lambda:path/2015-03-31/functions/${LambdaFunctionArn}/invocations'
+        - Partition: !Ref 'AWS::Partition'
+          Region: !Ref 'AWS::Region'
           LambdaFunctionArn: {'Fn::ImportValue': !Sub '${LambdaModule}-Arn'}
       ResourceId: !GetAtt 'RestApi.RootResourceId'
       RestApiId: !Ref RestApi
