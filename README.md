@@ -30,6 +30,14 @@ Resources:
       TemplateURL: './node_modules/@cfn-modules/lambda-event-source-webhook/module.yml'
 ```
 
+## Examples
+
+* [serverless-webhook](https://github.com/cfn-modules/docs/tree/master/examples/serverless-webhook)
+
+## Related modules
+
+* [lambda-function](https://github.com/cfn-modules/lambda-function)
+
 ## Parameters
 
 <table>
