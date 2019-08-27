@@ -88,11 +88,12 @@ Resources:
         Value: !Ref 'AWS::StackName'
       - Name: Stage
         Value: !Ref Stage
+      TreatMissingData: notBreaching
 Outputs:
   ModuleId:
     Value: 'lambda-event-source-webhook'
   ModuleVersion:
-    Value: '1.0.1'
+    Value: '1.1.0'
   StackName:
     Value: !Ref 'AWS::StackName'
   Url:
