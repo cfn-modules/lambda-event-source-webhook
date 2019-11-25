@@ -1,6 +1,6 @@
 {
   "name": "@cfn-modules/lambda-event-source-webhook",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Webhook event source for AWS Lambda function",
   "author": "Michael Wittig <michael@widdix.de>",
   "license": "Apache-2.0",
