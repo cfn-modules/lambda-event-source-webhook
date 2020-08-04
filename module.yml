@@ -37,90 +37,26 @@ Resources:
       Action: 'lambda:InvokeFunction'
       FunctionName: {'Fn::ImportValue': !Sub '${LambdaModule}-Name'}
       Principal: 'apigateway.amazonaws.com'
-      SourceArn: !Sub 'arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${RestApi}/*/${HttpMethod}/'
-  RestApi:
-    Type: 'AWS::ApiGateway::RestApi'
+      SourceArn: !Sub 'arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${Api}/*/$default'
+  Api:
+    Type: 'AWS::ApiGatewayV2::Api'
     Properties:
+      #CorsConfiguration:
       Name: !Ref 'AWS::StackName'
-  Stage:
-    Type: 'AWS::ApiGateway::Stage'
-    Properties:
-      DeploymentId: !Ref DeploymentCustom
-      RestApiId: !Ref RestApi
-      StageName: webhook
-  DeploymentCustom:
-    DependsOn: Method
-    Type: 'Custom::Deployment'
-    Version: '1.0'
-    Properties:
-      LambdaModule: !Ref LambdaModule
-      HttpMethod: !Ref HttpMethod
-      RestApiId: !Ref RestApi
-      ServiceToken: !GetAtt 'DeploymentFunction.Outputs.Arn'
-  Method:
-    Type: 'AWS::ApiGateway::Method'
-    Properties:
-      AuthorizationType: NONE
-      HttpMethod: !Ref HttpMethod
-      Integration:
-        IntegrationHttpMethod: 'POST'
-        PassthroughBehavior: 'WHEN_NO_MATCH'
-        Type: 'AWS_PROXY'
-        Uri: !Sub
-        - 'arn:${Partition}:apigateway:${Region}:lambda:path/2015-03-31/functions/${LambdaFunctionArn}/invocations'
-        - Partition: !Ref 'AWS::Partition'
-          Region: !Ref 'AWS::Region'
-          LambdaFunctionArn: {'Fn::ImportValue': !Sub '${LambdaModule}-Arn'}
-      ResourceId: !GetAtt 'RestApi.RootResourceId'
-      RestApiId: !Ref RestApi
-  Alarm5XXErrorTooHigh:
-    Condition: HasAlertingModule
-    Type: 'AWS::CloudWatch::Alarm'
-    Properties:
-      AlarmDescription: 'Api Gateway server-side errors captured'
-      Namespace: 'AWS/ApiGateway'
-      MetricName: 5XXError
-      Statistic: Sum
-      Period: 60
-      EvaluationPeriods: 1
-      ComparisonOperator: GreaterThanThreshold
-      Threshold: 0
-      AlarmActions:
-      - 'Fn::ImportValue': !Sub '${AlertingModule}-Arn'
-      Dimensions:
-      - Name: ApiName
-        Value: !Ref 'AWS::StackName'
-      - Name: Stage
-        Value: !Ref Stage
-      TreatMissingData: notBreaching
-  DeploymentFunctionPolicy:
-    Type: 'AWS::IAM::ManagedPolicy'
-    Properties:
-      PolicyDocument:
-        Version: '2012-10-17'
-        Statement:
-        - Effect: Allow
-          Action:
-          - 'apigateway:POST'
-          - 'apigateway:DELETE'
-          Resource: !Sub 'arn:${AWS::Partition}:apigateway:${AWS::Region}::/restapis/${RestApi}/*'
-  DeploymentFunction:
-    Type: 'AWS::CloudFormation::Stack'
-    Properties:
-      Parameters:
-        Handler: 'custom-resource-deployment.handler'
-        Runtime: 'nodejs10.x'
-        Timeout: '30'
-        ManagedPolicyArns: !Ref DeploymentFunctionPolicy
-      TemplateURL: './node_modules/@cfn-modules/lambda-function/module.yml'
+      ProtocolType: HTTP
+      Target: !Sub
+      - 'arn:${Partition}:apigateway:${Region}:lambda:path/2015-03-31/functions/${LambdaFunctionArn}/invocations'
+      - Partition: !Ref 'AWS::Partition'
+        Region: !Ref 'AWS::Region'
+        LambdaFunctionArn: {'Fn::ImportValue': !Sub '${LambdaModule}-Arn'}
 Outputs:
   ModuleId:
     Value: 'lambda-event-source-webhook'
   ModuleVersion:
-    Value: '1.2.1'
+    Value: '2.0.0'
   StackName:
     Value: !Ref 'AWS::StackName'
   Url:
-    Value: !Sub 'https://${RestApi}.execute-api.${AWS::Region}.amazonaws.com/${Stage}'
+    Value: !Sub 'https://${Api}.execute-api.${AWS::Region}.amazonaws.com'
     Export:
       Name: !Sub '${AWS::StackName}-Url'
