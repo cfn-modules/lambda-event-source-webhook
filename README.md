@@ -1,6 +1,3 @@
-[![Build Status](https://travis-ci.org/cfn-modules/lambda-event-source-webhook.svg?branch=master)](https://travis-ci.org/cfn-modules/lambda-event-source-webhook)
-[![NPM version](https://img.shields.io/npm/v/@cfn-modules/lambda-event-source-webhook.svg)](https://www.npmjs.com/package/@cfn-modules/lambda-event-source-webhook)
-
 # cfn-modules: AWS Lambda event source: webhook
 
 Webhook event source for AWS Lambda function with [alerting](https://www.npmjs.com/package/@cfn-modules/alerting).
