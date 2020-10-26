@@ -23,11 +23,6 @@ Parameters:
     Description: 'Optional but recommended stack name of alerting module.'
     Type: String
     Default: ''
-  HttpMethod:
-    Description: 'The HTTP method that clients use to call this method.'
-    Type: String
-    Default: ANY
-    AllowedValues: [ANY, GET, HEAD, POST, PUT, DELETE, OPTIONS]
 Conditions:
   HasAlertingModule: !Not [!Equals [!Ref AlertingModule, '']]
 Resources:
@@ -41,7 +36,6 @@ Resources:
   Api:
     Type: 'AWS::ApiGatewayV2::Api'
     Properties:
-      #CorsConfiguration:
       Name: !Ref 'AWS::StackName'
       ProtocolType: HTTP
       Target: !Sub
@@ -49,6 +43,26 @@ Resources:
       - Partition: !Ref 'AWS::Partition'
         Region: !Ref 'AWS::Region'
         LambdaFunctionArn: {'Fn::ImportValue': !Sub '${LambdaModule}-Arn'}
+  Alarm5XXErrorTooHigh:
+    Condition: HasAlertingModule
+    Type: 'AWS::CloudWatch::Alarm'
+    Properties:
+      AlarmDescription: 'Api Gateway server-side errors captured'
+      Namespace: 'AWS/ApiGateway'
+      MetricName: 5xx
+      Statistic: Sum
+      Period: 60
+      EvaluationPeriods: 1
+      ComparisonOperator: GreaterThanThreshold
+      Threshold: 0
+      AlarmActions:
+      - 'Fn::ImportValue': !Sub '${AlertingModule}-Arn'
+      Dimensions:
+      - Name: ApiId
+        Value: !Ref Api
+      - Name: Stage
+        Value: '$default'
+      TreatMissingData: notBreaching
 Outputs:
   ModuleId:
     Value: 'lambda-event-source-webhook'
@@ -57,6 +71,6 @@ Outputs:
   StackName:
     Value: !Ref 'AWS::StackName'
   Url:
-    Value: !Sub 'https://${Api}.execute-api.${AWS::Region}.amazonaws.com'
+    Value: !GetAtt 'Api.ApiEndpoint'
     Export:
       Name: !Sub '${AWS::StackName}-Url'
