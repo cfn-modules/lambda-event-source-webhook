@@ -23,7 +23,6 @@ Resources:
       Parameters:
         LambdaModule: !GetAtt 'Lambda.Outputs.StackName' # required
         AlertingModule: !GetAtt 'Alerting.Outputs.StackName' # optional
-        HttpMethod: 'ANY' # optional
       TemplateURL: './node_modules/@cfn-modules/lambda-event-source-webhook/module.yml'
 ```
 
@@ -61,13 +60,6 @@ Resources:
       <td></td>
       <td>no</td>
       <td></td>
-    </tr>
-    <tr>
-      <td>HttpMethod</td>
-      <td>The HTTP method that clients use to call this method</td>
-      <td>ANY</td>
-      <td>no</td>
-      <td>[ANY, GET, HEAD, POST, PUT, DELETE, OPTIONS]</td>
     </tr>
   </tbody>
 </table>

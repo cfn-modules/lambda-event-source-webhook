@@ -67,7 +67,7 @@ Outputs:
   ModuleId:
     Value: 'lambda-event-source-webhook'
   ModuleVersion:
-    Value: '2.0.0'
+    Value: '2.0.1'
   StackName:
     Value: !Ref 'AWS::StackName'
   Url:
